@@ -108,7 +108,12 @@ def build_cios(args):
             # to go at the index specified.
             new_module = target_path.read_bytes()
             if target_index == -1:
-                title.add_content(new_module, cid, libWiiPy.title.ContentType.NORMAL)
+                #replace content if the same id already appeared
+                try:
+                    title.add_content(new_module, cid, libWiiPy.title.ContentType.NORMAL)
+                except Exception:
+                    target_index = title.content.get_index_from_cid(cid)
+                    title.set_content(new_module, target_index, cid, libWiiPy.title.ContentType.NORMAL)
             else:
                 existing_module = title.get_content_by_index(target_index)
                 existing_cid = title.content.content_records[target_index].content_id
