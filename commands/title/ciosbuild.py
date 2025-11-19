@@ -17,7 +17,7 @@ def build_cios(args):
     else:
         modules_path = pathlib.Path(os.getcwd())
     output_path = pathlib.Path(args.output)
-
+    print("modules path: ", modules_path)
     if not base_path.exists():
         fatal_error(f"The specified base IOS file \"{base_path}\" does not exist!")
     if not map_path.exists():
@@ -119,7 +119,10 @@ def build_cios(args):
                 existing_cid = title.content.content_records[target_index].content_id
                 existing_type = title.content.content_records[target_index].content_type
                 title.set_content(new_module, target_index, cid, libWiiPy.title.ContentType.NORMAL)
-                title.add_content(existing_module, existing_cid, existing_type)
+                # Only add back the existing module if its CID doesn't conflict with the new module's CID
+                # This allows replacement when tmdmoduleid targets an existing content slot
+                if existing_cid != cid:
+                    title.add_content(existing_module, existing_cid, existing_type)
 
     # Last cIOS building step, we need to set the slot and version.
     slot = args.slot
